@@ -93,14 +93,15 @@ double aplicar_ga(const double *d, int n, int n_gen, int tam_pob, double m_rate,
 	}
 	double ti = mseconds();
 	// crea cada individuo (array de enteros aleatorios)
+	omp_set_nested(1);
 	#pragma omp parallel for num_threads(NHI) schedule(dynamic, tam_pob/(NHF*2))
 	for(i = 0; i < tam_pob; i++) {
 		poblacion[i] = (Individuo *) malloc(sizeof(Individuo));
 		poblacion[i]->array_int = crear_individuo(n);
 		
-		//omp_set_nested(1);
+		omp_set_nested(1);
 		// calcula el fitness del individuo
-		fitness(d, poblacion[i], n);
+		fitness_reduction(d, poblacion[i], n, NHF);
 	}
 	double tf = mseconds();
 	printf("%lf\n", (tf - ti));
